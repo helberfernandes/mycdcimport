@@ -30,7 +30,9 @@ public class Capitulo {
 	@JoinColumn(name="parte_id", referencedColumnName="parte_id")
 	private Parte parte = new Parte();
 	
-	
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name="seccao_id", referencedColumnName="seccao_id")
+	private Seccao seccao;
 	
 	
 	@OneToMany	
@@ -77,6 +79,12 @@ public class Capitulo {
 	}
 	public void setParte(Parte parte) {
 		this.parte = parte;
+	}
+	public Seccao getSeccao() {
+		return seccao;
+	}
+	public void setSeccao(Seccao seccao) {
+		this.seccao = seccao;
 	}
 	
 	

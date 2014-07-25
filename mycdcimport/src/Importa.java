@@ -49,10 +49,9 @@ public class Importa {
 			Livro livro = null;
 			Titulo titulo = null;
 			Parte parte = null;
-			Capitulo capitulo =null;
-			Artigo artigo =null;
+			Capitulo capitulo = null;
+			Artigo artigo = null;
 			Seccao seccao = null;
-			
 
 			while (s != null) {
 
@@ -63,8 +62,6 @@ public class Importa {
 							.compile("LIVRO [A-Z]{1,3} - [A-Z \\p{L}]*");
 					m = pegaJava.matcher(s);
 
-					// enquanto o Matcher encontrar o pattern na String
-					// fornecida:
 					while (m.find()) {
 						if (livro != null) {
 							livros.add(livro);
@@ -74,77 +71,88 @@ public class Importa {
 					}
 
 					pegaJava = Pattern
-							.compile("PARTE [A-Z]{1,3} - [A-Z \\p{L}]*");
+							.compile("PARTE [A-Z]{1,4} - [A-Z \\p{L}]*");
 					m = pegaJava.matcher(s);
 
-					// enquanto o Matcher encontrar o pattern na String
-					// fornecida:
 					while (m.find()) {
 						parte = new Parte();
 						parte.setDescricao(m.group());
 						livro.getPartes().add(parte);
 					}
-					
-					
+
 					pegaJava = Pattern
-							.compile("SECÇÃO [0-9]{1,3} - [A-Z \\p{L}]*");
+							.compile("SECÇÃO [A-Z]{1,4} - [A-Z \\p{L}]*");
 					m = pegaJava.matcher(s);
-					seccao = new Seccao();
-					
+
 					while (m.find()) {
+						seccao = new Seccao();
 						seccao.setDescricao(m.group());
 						parte.getSeccaos().add(seccao);
 					}
 					
-					
-					
+					if(!m.find()){
+						seccao=null;
+					}
 
 					pegaJava = Pattern
-							.compile("TÍTULO [A-Z]{1,3} - [A-Z \\p{L}]*");
+							.compile("TÍTULO [A-Z]{1,4} - [A-Z \\p{L}]*");
 					m = pegaJava.matcher(s);
-					
 
-					// enquanto o Matcher encontrar o pattern na String
-					// fornecida:
 					while (m.find()) {
 						titulo = new Titulo();
 						titulo.setDescricao(m.group());
 						livro.getTitulos().add(titulo);
 
-						if(seccao!=null){
+						if (seccao != null) {
 							titulo.setSeccao(seccao);
-						}else if (parte != null) {
+						}
+
+						if (parte != null) {
 							titulo.setParte(parte);
 						}
-						
-						
+
 					}
 					
 					
+					if(!m.find()){
+						titulo=null;
+					}
+
 					pegaJava = Pattern
-							.compile("CAPÍTULO [A-Z]{1,3} - [A-Z \\p{L}]*");
+							.compile("CAPÍTULO [A-Z]{1,4} - [A-Z \\p{L}]*");
 					m = pegaJava.matcher(s);
-					
-					
+
 					while (m.find()) {
 						capitulo = new Capitulo();
 						capitulo.setDescricao(m.group());
-						titulo.getCapitulos().add(capitulo);						
+						if(titulo!=null){
+							titulo.getCapitulos().add(capitulo);
+						}
+
+						if (seccao != null) {
+							capitulo.setSeccao(seccao);
+						}
+
 					}
 					
-					
-					
+					if(!m.find()){
+						capitulo=null;
+					}
+
 					pegaJava = Pattern
-							.compile("Art. [0-9]{1,3} - [A-Z \\p{L}]*");
+							.compile("Art. [0-9]{1,4} - [A-Z \\p{L}]*");
 					m = pegaJava.matcher(s);
 					artigo = new Artigo();
-					
+
 					while (m.find()) {
 						artigo.setDescricao(m.group());
-						capitulo.getArtigos().add(artigo);						
+						if(capitulo!=null){
+						capitulo.getArtigos().add(artigo);
+						}
+						
+					
 					}
-					
-					
+
 				}
 			}
 
@@ -156,16 +164,72 @@ public class Importa {
 				for (Parte parte2 : livro2.getPartes()) {
 					System.out.println("|__" + parte2.getDescricao());
 
-					for (Titulo titulo2 : livro2.getTitulos()) {
-						if (titulo2.getParte().getDescricao()
-								.equals(parte2.getDescricao())) {
-							System.out
-									.println("|____" + titulo2.getDescricao());
+					for (Seccao seccao2 : parte2.getSeccaos()) {
+						System.out.println("|____" + seccao2.getDescricao());
+
+						for (Titulo titulo2 : livro2.getTitulos()) {
+
+							if (titulo2.getSeccao() != null) {
+								if (seccao2.getDescricao().equals(
+										titulo2.getSeccao().getDescricao())) {
+									if (titulo2.getParte().getDescricao()
+											.equals(parte2.getDescricao())) {
+										System.out.println("|______"
+												+ titulo2.getDescricao());
+
+										for (Capitulo capitulo2 : titulo2
+												.getCapitulos()) {
+											System.out.println("|__________SSSS"
+													+ capitulo2.getDescricao());
+											for (Artigo artigo2 : capitulo2
+													.getArtigos()) {
+												System.out
+														.println("|____________SSSS"
+																+ artigo2
+																		.getDescricao());
+											}
+										}
+									}
+								}
+							}
+						}
+						
+						
+						for (Capitulo capitulo2 : seccao2
+								.getCapitulos()) {
 							
-							for(Capitulo capitulo2: titulo2.getCapitulos()){
-								System.out.println("|______" + capitulo2.getDescricao());
-								for(Artigo artigo2: capitulo2.getArtigos()){
-									System.out.println("|________" + artigo2.getDescricao());
+							if(capitulo2.getTitulo()==null){
+							System.out.println("|________________________________"
+									+ capitulo2.getDescricao());
+							for (Artigo artigo2 : capitulo2
+									.getArtigos()) {
+								System.out
+										.println("|_______________________________"
+												+ artigo2
+														.getDescricao());
+							}
+						}
+						}
+						
+
+					}
+
+					for (Titulo titulo2 : livro2.getTitulos()) {
+						if (titulo2.getSeccao() == null) {
+							if (titulo2.getParte().getDescricao()
+									.equals(parte2.getDescricao())) {
+								System.out.println("|____"
+										+ titulo2.getDescricao());
+
+								for (Capitulo capitulo2 : titulo2
+										.getCapitulos()) {
+									System.out.println("|______***"
+											+ capitulo2.getDescricao());
+									for (Artigo artigo2 : capitulo2
+											.getArtigos()) {
+										System.out.println("|________***"
+												+ artigo2.getDescricao());
+									}
 								}
 							}
 						}
@@ -175,11 +239,13 @@ public class Importa {
 				if (livro2.getPartes().size() == 0) {
 					for (Titulo titulo2 : livro2.getTitulos()) {
 						System.out.println("|__" + titulo2.getDescricao());
-						
-						for(Capitulo capitulo2: titulo2.getCapitulos()){
-							System.out.println("|____" + capitulo2.getDescricao());
-							for(Artigo artigo2: capitulo2.getArtigos()){
-								System.out.println("|________" + artigo2.getDescricao());
+
+						for (Capitulo capitulo2 : titulo2.getCapitulos()) {
+							System.out.println("|____"
+									+ capitulo2.getDescricao());
+							for (Artigo artigo2 : capitulo2.getArtigos()) {
+								System.out.println("|________"
+										+ artigo2.getDescricao());
 							}
 						}
 					}

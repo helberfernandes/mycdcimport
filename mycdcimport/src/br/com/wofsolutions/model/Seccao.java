@@ -32,9 +32,15 @@ public class Seccao {
 	private List<Canone> canones = new ArrayList<Canone>();
 	
 	
-//	@OneToMany	
-//	@JoinColumn(name="seccao_id", referencedColumnName="seccao_id")	
-//	private List<Capitulo> capitulos = new ArrayList<Capitulo>();
+	
+	@OneToMany	
+	@JoinColumn(name="livro_id", referencedColumnName="livro_id")	
+	private List<Titulo> titulos  = new ArrayList<Titulo>();
+	
+		
+	@OneToMany	
+	@JoinColumn(name="seccao_id", referencedColumnName="seccao_id")	
+	private List<Capitulo> capitulos = new ArrayList<Capitulo>();
 
 	
 	public String getTitulo() {
@@ -69,12 +75,18 @@ public class Seccao {
 	public void setCanones(List<Canone> canones) {
 		this.canones = canones;
 	}
-//	public List<Capitulo> getCapitulos() {
-//		return capitulos;
-//	}
-//	public void setCapitulos(List<Capitulo> capitulos) {
-//		this.capitulos = capitulos;
-//	}
+	public List<Capitulo> getCapitulos() {
+		return capitulos;
+	}
+	public void setCapitulos(List<Capitulo> capitulos) {
+		this.capitulos = capitulos;
+	}
+	public List<Titulo> getTitulos() {
+		return titulos;
+	}
+	public void setTitulos(List<Titulo> titulos) {
+		this.titulos = titulos;
+	}
 	
 	
 	
