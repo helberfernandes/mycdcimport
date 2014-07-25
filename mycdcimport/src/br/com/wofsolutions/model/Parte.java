@@ -36,6 +36,10 @@ public class Parte {
 	@JoinColumn(name="parte_id", referencedColumnName="parte_id")	
 	private List<Seccao> seccaos = new ArrayList<Seccao>();
 	
+	
+	@OneToMany	
+	@JoinColumn(name="parte_id", referencedColumnName="parte_id")		
+	private List<Canone> canones = new ArrayList<Canone>();
 
 	public String getDescricao() {
 		return descricao;
@@ -66,6 +70,12 @@ public class Parte {
 	}
 	public void setSeccaos(List<Seccao> seccaos) {
 		this.seccaos = seccaos;
+	}
+	public List<Canone> getCanones() {
+		return canones;
+	}
+	public void setCanones(List<Canone> canones) {
+		this.canones = canones;
 	}
 	
 	

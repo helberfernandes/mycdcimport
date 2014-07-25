@@ -36,9 +36,15 @@ public class Titulo {
 	@JoinColumn(name="titulo_id", referencedColumnName="titulo_id")	
 	private List<Capitulo> capitulos = new ArrayList<Capitulo>();
 	
-//	@ManyToOne(cascade = CascadeType.ALL)
-//	@JoinColumn(name="parte_id", referencedColumnName="parte_id")
-//	private Parte  parte;
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name="parte_id", referencedColumnName="parte_id")
+	private Parte  parte;
+	
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name="seccao_id", referencedColumnName="seccao_id")
+	private Seccao seccao;
+	
+	
 	
 	public String getTitulo() {
 		return titulo;
@@ -64,12 +70,12 @@ public class Titulo {
 	public void setTituloId(Integer tituloId) {
 		this.tituloId = tituloId;
 	}
-//	public Parte getParte() {
-//		return parte;
-//	}
-//	public void setParte(Parte parte) {
-//		this.parte = parte;
-//	}
+	public Parte getParte() {
+		return parte;
+	}
+	public void setParte(Parte parte) {
+		this.parte = parte;
+	}
 	public List<Canone> getCanones() {
 		return canones;
 	}
@@ -81,6 +87,12 @@ public class Titulo {
 	}
 	public void setCapitulos(List<Capitulo> capitulos) {
 		this.capitulos = capitulos;
+	}
+	public Seccao getSeccao() {
+		return seccao;
+	}
+	public void setSeccao(Seccao seccao) {
+		this.seccao = seccao;
 	}
 	
 	
