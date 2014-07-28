@@ -8,12 +8,15 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import br.com.wofsolutions.dao.LivroDAOImpl;
 import br.com.wofsolutions.model.Artigo;
+import br.com.wofsolutions.model.Canone;
 import br.com.wofsolutions.model.Capitulo;
 import br.com.wofsolutions.model.Livro;
 import br.com.wofsolutions.model.Parte;
 import br.com.wofsolutions.model.Seccao;
 import br.com.wofsolutions.model.Titulo;
+import br.com.wofsolutions.util.HibernateUtil;
 
 public class Importa {
 
@@ -21,6 +24,9 @@ public class Importa {
 
 	public static void main(String[] args) {
 		lerArquivo("C:\\Users\\Helber\\Documents\\codex-iuris-canonici_po.txt");
+		
+		
+		
 	}
 
 	public static void lerArquivo(String arquivo) {
@@ -52,6 +58,16 @@ public class Importa {
 			Capitulo capitulo = null;
 			Artigo artigo = null;
 			Seccao seccao = null;
+			Canone canone= null;
+			
+			HibernateUtil.gerabanco();
+
+			// Livro livro = new Livro();
+			// livro.setTitulo("ssss");
+			//
+			LivroDAOImpl livroDAOImpl = new LivroDAOImpl();
+			
+			
 
 			while (s != null) {
 
@@ -68,6 +84,18 @@ public class Importa {
 						}
 						livro = new Livro();
 						livro.setDescricao(m.group());
+						
+						livroDAOImpl.salvar(livro);
+						
+						
+						
+						//inicia novamente os outros itens
+						parte=null;
+						titulo=null;
+						seccao=null;
+						capitulo=null;
+						artigo=null;
+						canone =null;
 					}
 
 					pegaJava = Pattern
@@ -77,7 +105,10 @@ public class Importa {
 					while (m.find()) {
 						parte = new Parte();
 						parte.setDescricao(m.group());
+						parte.setLivro(livroDAOImpl.getLivro(livro));
 						livro.getPartes().add(parte);
+						
+						livroDAOImpl.salvar(parte);
 					}
 
 					pegaJava = Pattern
@@ -87,13 +118,13 @@ public class Importa {
 					while (m.find()) {
 						seccao = new Seccao();
 						seccao.setDescricao(m.group());
+						seccao.setParte(livroDAOImpl.getParte(parte));
 						parte.getSeccaos().add(seccao);
+						
+						livroDAOImpl.salvar(seccao);
 					}
 					
-					if(!m.find()){
-						seccao=null;
-					}
-
+				
 					pegaJava = Pattern
 							.compile("TÍTULO [A-Z]{1,4} - [A-Z \\p{L}]*");
 					m = pegaJava.matcher(s);
@@ -101,22 +132,24 @@ public class Importa {
 					while (m.find()) {
 						titulo = new Titulo();
 						titulo.setDescricao(m.group());
+						titulo.setLivro(livroDAOImpl.getLivro(livro));
+						
 						livro.getTitulos().add(titulo);
-
+						
 						if (seccao != null) {
-							titulo.setSeccao(seccao);
+							titulo.setSeccao(livroDAOImpl.getSeccao(seccao));
 						}
 
 						if (parte != null) {
-							titulo.setParte(parte);
+							titulo.setParte(livroDAOImpl.getParte(parte));
 						}
+						
+						livroDAOImpl.salvar(titulo);
 
 					}
 					
 					
-					if(!m.find()){
-						titulo=null;
-					}
+					
 
 					pegaJava = Pattern
 							.compile("CAPÍTULO [A-Z]{1,4} - [A-Z \\p{L}]*");
@@ -127,129 +160,130 @@ public class Importa {
 						capitulo.setDescricao(m.group());
 						if(titulo!=null){
 							titulo.getCapitulos().add(capitulo);
+							capitulo.setTitulo(livroDAOImpl.getTitulo(titulo));
 						}
 
 						if (seccao != null) {
-							capitulo.setSeccao(seccao);
+							capitulo.setSeccao(livroDAOImpl.getSeccao(seccao));
 						}
+						
+						if (parte != null) {
+							capitulo.setParte(livroDAOImpl.getParte(parte));						
+						}
+						
+						livroDAOImpl.salvar(capitulo);
 
 					}
 					
-					if(!m.find()){
-						capitulo=null;
-					}
+				
 
 					pegaJava = Pattern
 							.compile("Art. [0-9]{1,4} - [A-Z \\p{L}]*");
 					m = pegaJava.matcher(s);
-					artigo = new Artigo();
+					
 
 					while (m.find()) {
+						artigo = new Artigo();
 						artigo.setDescricao(m.group());
 						if(capitulo!=null){
 						capitulo.getArtigos().add(artigo);
+						artigo.setCapitulo(livroDAOImpl.getCapitulo(capitulo));
 						}
-						
-					
+						livroDAOImpl.salvar(artigo);
 					}
+					
+					
+					
+					
 
-				}
+					
+					
+					 if (s.contains("Cân.")) {
+						
+							String numcan = s.substring(s.indexOf("Cân."),
+									s.indexOf("—") + 1);
+							numcan = numcan.replace("Cân.", "");
+							numcan = numcan.replace("—", "");
+							
+							if(canone!=null){
+								livroDAOImpl.salvar(canone);
+							}
+							canone = new Canone();
+							canone.setNumero(numcan.trim());
+							// s= s.replace(s.substring(s.indexOf("Cï¿½n."),
+							// s.indexOf("ï¿½")+1), "");
+							canone.setLivro(livroDAOImpl.getLivro(livro));
+							
+							if(titulo!=null){
+								canone.setTitulo(livroDAOImpl.getTitulo(titulo));
+							}
+							if(capitulo!=null){
+								canone.setCapitulo(livroDAOImpl.getCapitulo(capitulo));
+							}
+							if(parte!=null){
+								canone.setParte(livroDAOImpl.getParte(parte));
+							}
+							if(artigo!=null){
+								canone.setArtigo(livroDAOImpl.getArtigo(artigo));
+							}
+
+							canone.setDescricao(s);
+
+							// System.out.println(canone.getNumero()+"------------"+canone.getLivro().getDescricao()+"------------"+canone.getDescricao());
+
+							// fimCan = false;
+							// System.out.println(canone.getNumero()+"------------"+canone.getLivro().getDescricao()+"------------"+canone.getDescricao());
+
+							// fimCan = false;
+
+							if (canone != null) {
+								livro.getCanones().add(canone);
+								if (canone.getTitulo() != null) {
+									titulo.getCanones().add(canone);
+								} else if (canone.getCapitulo() != null) {
+
+								} else if (canone.getLivro() != null) {// caso o
+																		// canone
+																		// nao tenha
+																		// nem
+																		// capitulo
+																		// nem
+																		// titulo
+																		// ele e do
+																		// livro
+									// livro.getCanones().add(canone);
+								}
+
+								if (canone.getParte() != null) {
+
+									parte.getCanones().add(canone);
+								}
+								
+													}
+
+						} else if (!s.trim().isEmpty()) {
+							if (canone != null) {
+								canone.setDescricao(canone.getDescricao() + s);
+							}
+						}
+					
+
 			}
 
+			}
 			livros.add(livro);// o ultimo livro so e pego quando termina o while
 
 			for (Livro livro2 : livros) {
 				System.out.println(livro2.getDescricao());
-
-				for (Parte parte2 : livro2.getPartes()) {
-					System.out.println("|__" + parte2.getDescricao());
-
-					for (Seccao seccao2 : parte2.getSeccaos()) {
-						System.out.println("|____" + seccao2.getDescricao());
-
-						for (Titulo titulo2 : livro2.getTitulos()) {
-
-							if (titulo2.getSeccao() != null) {
-								if (seccao2.getDescricao().equals(
-										titulo2.getSeccao().getDescricao())) {
-									if (titulo2.getParte().getDescricao()
-											.equals(parte2.getDescricao())) {
-										System.out.println("|______"
-												+ titulo2.getDescricao());
-
-										for (Capitulo capitulo2 : titulo2
-												.getCapitulos()) {
-											System.out.println("|__________SSSS"
-													+ capitulo2.getDescricao());
-											for (Artigo artigo2 : capitulo2
-													.getArtigos()) {
-												System.out
-														.println("|____________SSSS"
-																+ artigo2
-																		.getDescricao());
-											}
-										}
-									}
-								}
-							}
-						}
-						
-						
-						for (Capitulo capitulo2 : seccao2
-								.getCapitulos()) {
-							
-							if(capitulo2.getTitulo()==null){
-							System.out.println("|________________________________"
-									+ capitulo2.getDescricao());
-							for (Artigo artigo2 : capitulo2
-									.getArtigos()) {
-								System.out
-										.println("|_______________________________"
-												+ artigo2
-														.getDescricao());
-							}
-						}
-						}
-						
-
-					}
-
-					for (Titulo titulo2 : livro2.getTitulos()) {
-						if (titulo2.getSeccao() == null) {
-							if (titulo2.getParte().getDescricao()
-									.equals(parte2.getDescricao())) {
-								System.out.println("|____"
-										+ titulo2.getDescricao());
-
-								for (Capitulo capitulo2 : titulo2
-										.getCapitulos()) {
-									System.out.println("|______***"
-											+ capitulo2.getDescricao());
-									for (Artigo artigo2 : capitulo2
-											.getArtigos()) {
-										System.out.println("|________***"
-												+ artigo2.getDescricao());
-									}
-								}
-							}
-						}
-					}
-
+				
+				if(livro2.getPartes().size()>0){// parte vem antes de todos os outros itens
+					imprimeParte(livro2.getPartes());
+				}else{//caso o livro já comece com um titulo.
+					imprimeTitulo(livro2.getTitulos());
 				}
-				if (livro2.getPartes().size() == 0) {
-					for (Titulo titulo2 : livro2.getTitulos()) {
-						System.out.println("|__" + titulo2.getDescricao());
-
-						for (Capitulo capitulo2 : titulo2.getCapitulos()) {
-							System.out.println("|____"
-									+ capitulo2.getDescricao());
-							for (Artigo artigo2 : capitulo2.getArtigos()) {
-								System.out.println("|________"
-										+ artigo2.getDescricao());
-							}
-						}
-					}
-				}
+				
+				
+				
 			}
 
 		} catch (Exception e) {
@@ -258,5 +292,47 @@ public class Importa {
 		}
 
 	}
+	
+	private static void imprimeTitulo(List<Titulo> list){
+		for (Titulo titulo : list) {
+			if (titulo.getSeccao() == null) { // devemos imprimir a seccao primeiro
+				System.out.println("|__" + titulo.getDescricao());
+				if(titulo.getCapitulos().size()>0){
+					imprimeCapitulo(titulo.getCapitulos());
+				}
+				
+			}
+		}
+	}
+	
+	private static void imprimeCapitulo(List<Capitulo> list){
+		for (Capitulo capitulo : list) {			
+				System.out.println("|____" + capitulo.getDescricao());
+				imprimeArtigo(capitulo.getArtigos());
+		}
+	}
+	
+	private static void imprimeArtigo(List<Artigo> list){
+		for (Artigo artigo : list) {			
+				System.out.println("|______" + artigo.getDescricao());
+		}
+	}
+	
+	private static void imprimeSeccao(List<Seccao> list){
+		for (Seccao seccao : list) {			
+				System.out.println("|______" + seccao.getDescricao());
+		}
+	}
+	
+	private static void imprimeParte(List<Parte> list){
+		for (Parte parte: list) {			
+				System.out.println("|__" + parte.getDescricao());
+				
+				if(parte.getSeccaos().size()>0){//caso a parte inicie com uma seccao
+					imprimeSeccao(parte.getSeccaos());
+				}
+		}
+	}
+	
 
 }

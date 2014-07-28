@@ -21,7 +21,7 @@ public class Artigo {
 	@GeneratedValue
 	@Column(name="artigo_id")
 	private Integer artigoId;
-	private String titulo;
+	
 	private String descricao;
 	
 	@ManyToOne(cascade = CascadeType.ALL)
@@ -33,12 +33,7 @@ public class Artigo {
 	private List<Canone> canones = new ArrayList<Canone>();
 	
 	
-	public String getTitulo() {
-		return titulo;
-	}
-	public void setTitulo(String titulo) {
-		this.titulo = titulo;
-	}
+	
 	public String getDescricao() {
 		return descricao;
 	}

@@ -19,8 +19,7 @@ public class Titulo {
 	@Id
 	@GeneratedValue
 	@Column(name="titulo_id")
-	private Integer tituloId;
-	private String titulo;
+	private Integer tituloId;	
 	private String descricao;
 	
 	@ManyToOne(cascade = CascadeType.ALL)
@@ -44,14 +43,7 @@ public class Titulo {
 	@JoinColumn(name="seccao_id", referencedColumnName="seccao_id")
 	private Seccao seccao;
 	
-	
-	
-	public String getTitulo() {
-		return titulo;
-	}
-	public void setTitulo(String titulo) {
-		this.titulo = titulo;
-	}
+
 	public String getDescricao() {
 		return descricao;
 	}

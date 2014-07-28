@@ -57,13 +57,27 @@ public class LivroDAOImpl implements Serializable {
 		ConexaoUtil conexaoUtil = new ConexaoUtil();
 
 		try {
+
 			PreparedStatement ps = conexaoUtil
 					.getCon()
 					.prepareStatement(
-							"INSERT INTO wof_titulos (descricao, livro_id) VALUES (?, ?)");
+							"INSERT INTO wof_titulos (descricao, livro_id, parte_id, seccao_id) VALUES (?, ?, ?,?)");
 			ps.setString(1, titulo.getDescricao());
 			ps.setInt(2, titulo.getLivro().getLivroId());
+			if (titulo.getParte() != null) {
+				ps.setInt(3, titulo.getParte().getParteId());
+			} else {
+				ps.setNull(3, 0);
+			}
+
+			if (titulo.getSeccao() != null) {
+				ps.setInt(4, titulo.getSeccao().getSeccaoId());
+			} else {
+				ps.setNull(4, 0);
+			}
+
 			ps.execute();
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -75,23 +89,26 @@ public class LivroDAOImpl implements Serializable {
 		ConexaoUtil conexaoUtil = new ConexaoUtil();
 		PreparedStatement ps;
 		try {
-			if (capitulo.getParte().getParteId() == null) {
-				ps = conexaoUtil
-						.getCon()
-						.prepareStatement(
-								"INSERT INTO wof_capitulos (descricao, titulo_id) VALUES (?, ?)");
-				ps.setString(1, capitulo.getDescricao());
-				ps.setInt(2, capitulo.getTitulo().getTituloId());
 
-			} else {
-				ps = conexaoUtil
-						.getCon()
-						.prepareStatement(
-								"INSERT INTO wof_capitulos (descricao, titulo_id, parte_id) VALUES (?, ?,?)");
-				ps.setString(1, capitulo.getDescricao());
-				ps.setInt(2, capitulo.getTitulo().getTituloId());
+			ps = conexaoUtil
+					.getCon()
+					.prepareStatement(
+							"INSERT INTO wof_capitulos (descricao, titulo_id, parte_id, seccao_id) VALUES (?, ?,?,?)");
+			ps.setString(1, capitulo.getDescricao());
+			ps.setInt(2, capitulo.getTitulo().getTituloId());
+
+			if (capitulo.getParte() != null) {
 				ps.setInt(3, capitulo.getParte().getParteId());
+			} else {
+				ps.setNull(3, 0);
 			}
+
+			if (capitulo.getSeccao() != null) {
+				ps.setInt(4, capitulo.getSeccao().getSeccaoId());
+			} else {
+				ps.setNull(4, 0);
+			}
+
 			ps.execute();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -160,37 +177,47 @@ public class LivroDAOImpl implements Serializable {
 
 		try {
 
-			if (canone.getTitulo() != null) {
-			//	if (canone.getTitulo().getTituloId() != null) {
+			if (getCanonePeloNumero(canone).getCanoneId() == null) {
 
-					if (getCanonePeloNumero(canone).getCanoneId() == null) {
+				ps = conexaoUtil
+						.getCon()
+						.prepareStatement(
+								"INSERT INTO wof_canones (descricao, numero,  livro_id, titulo_id, parte_id, capitulo_id, artigo_id) "
+										+ "VALUES (?, ?,?,?,?,?,?)");
+				ps.setString(1, canone.getDescricao());
+				ps.setString(2, canone.getNumero());
 
-						ps = conexaoUtil
-								.getCon()
-								.prepareStatement(
-										"INSERT INTO wof_canones (descricao, numero,  livro_id, titulo_id, parte_id) VALUES (?, ?,?,?,?)");
-						ps.setString(1, canone.getDescricao());
-						ps.setString(2, canone.getNumero());
-						ps.setInt(3, canone.getLivro().getLivroId()==null?0:canone.getLivro().getLivroId());
-						ps.setInt(4, canone.getTitulo().getTituloId()==null?0:canone.getTitulo().getTituloId());
-						if(canone.getParte()==null){
-							canone.setParte(new Parte());
-						}
-						ps.setInt(5, canone.getParte().getParteId()==null?0:canone.getParte().getParteId());
-						ps.execute();
-					}
+				if (canone.getLivro() != null) {
+					ps.setInt(3, canone.getLivro().getLivroId());
+				} else {
+					ps.setNull(3, 0);
 				}
 
-//			} else {
-//				ps = conexaoUtil
-//						.getCon()
-//						.prepareStatement(
-//								"INSERT INTO wof_canones (descricao, numero,  livro_id) VALUES (?, ?,?)");
-//				ps.setString(1, canone.getDescricao());
-//				ps.setString(2, canone.getNumero());
-//				ps.setInt(3, canone.getLivro().getLivroId());
-//				ps.execute();
-//			}
+				if (canone.getTitulo() != null) {
+					ps.setInt(4, canone.getTitulo().getTituloId());
+				} else {
+					ps.setNull(4, 0);
+				}
+				if (canone.getParte() != null) {
+					ps.setInt(5, canone.getParte().getParteId());
+				} else {
+					ps.setNull(5, 0);
+				}
+
+				if (canone.getCapitulo() != null) {
+					ps.setInt(6, canone.getCapitulo().getCapituloId());
+				} else {
+					ps.setNull(6, 0);
+				}
+
+				if (canone.getArtigo() != null) {					
+					ps.setInt(7, canone.getArtigo().getArtigoId());
+				} else {
+					ps.setNull(7, 0);
+				}
+
+				ps.execute();
+			}
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -205,10 +232,10 @@ public class LivroDAOImpl implements Serializable {
 
 		try {
 
-			if(canone.getNumero()==null){
+			if (canone.getNumero() == null) {
 				System.out.println(canone.getNumero());
 			}
-				
+
 			if (canone.getNumero().equals("204")) {
 				System.out.println(canone.getDescricao());
 				System.out.println(canone.getParte().getDescricao());
@@ -303,6 +330,42 @@ public class LivroDAOImpl implements Serializable {
 			e.printStackTrace();
 		}
 		return parte;
+	}
+
+	public Seccao getSeccao(Seccao seccao) {
+		ConexaoUtil conexaoUtil = new ConexaoUtil();
+
+		try {
+			PreparedStatement ps = conexaoUtil.getCon().prepareStatement(
+					"select seccao_id from wof_seccao where descricao=?");
+			ps.setString(1, seccao.getDescricao());
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				seccao.setSeccaoId(rs.getInt("seccao_id"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return seccao;
+	}
+
+	public Artigo getArtigo(Artigo artigo) {
+		ConexaoUtil conexaoUtil = new ConexaoUtil();
+
+		try {
+			PreparedStatement ps = conexaoUtil.getCon().prepareStatement(
+					"select artigo_id from wof_artigos where descricao=?");
+			ps.setString(1, artigo.getDescricao());
+			ResultSet rs = ps.executeQuery();
+			while (rs.next()) {
+				artigo.setArtigoId(rs.getInt("artigo_id"));
+			}
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return artigo;
 	}
 
 	public Canone getCanonePeloNumero(Canone canone) {

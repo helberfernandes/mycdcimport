@@ -28,7 +28,7 @@ public class Canone implements Serializable {
 	
 	
 	@Column(length=10)
-	private String numero;
+	private String numero="";
 	@Column(length=10000)
 	private String descricao;
 	
@@ -38,16 +38,21 @@ public class Canone implements Serializable {
 	
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="titulo_id", referencedColumnName="titulo_id")
-	private Titulo titulo = new Titulo();
+	private Titulo titulo ;
 	
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="capitulo_id", referencedColumnName="capitulo_id")
-	private Capitulo capitulo = new Capitulo();
+	private Capitulo capitulo;
 	
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="parte_id", referencedColumnName="parte_id")
-	private Parte parte = new Parte();
+	private Parte parte;
 	
+	
+	
+	@ManyToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name="artigo_id", referencedColumnName="artigo_id")
+	private Artigo artigo;
 	
 	public Integer getCanoneId() {
 		return canoneId;
@@ -90,6 +95,12 @@ public class Canone implements Serializable {
 	}
 	public void setParte(Parte parte) {
 		this.parte = parte;
+	}
+	public Artigo getArtigo() {
+		return artigo;
+	}
+	public void setArtigo(Artigo artigo) {
+		this.artigo = artigo;
 	}
 	
 	

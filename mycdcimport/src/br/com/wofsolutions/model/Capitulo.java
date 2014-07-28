@@ -28,7 +28,7 @@ public class Capitulo {
 	
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="parte_id", referencedColumnName="parte_id")
-	private Parte parte = new Parte();
+	private Parte parte;
 	
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="seccao_id", referencedColumnName="seccao_id")

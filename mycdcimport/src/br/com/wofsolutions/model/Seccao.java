@@ -21,7 +21,7 @@ public class Seccao {
 	@GeneratedValue
 	@Column(name="seccao_id")
 	private Integer seccaoId;
-	private String titulo;
+	
 	private String descricao;
 	@ManyToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name="parte_id", referencedColumnName="parte_id")
@@ -34,7 +34,7 @@ public class Seccao {
 	
 	
 	@OneToMany	
-	@JoinColumn(name="livro_id", referencedColumnName="livro_id")	
+	@JoinColumn(name="seccao_id", referencedColumnName="seccao_id")	
 	private List<Titulo> titulos  = new ArrayList<Titulo>();
 	
 		
@@ -43,12 +43,7 @@ public class Seccao {
 	private List<Capitulo> capitulos = new ArrayList<Capitulo>();
 
 	
-	public String getTitulo() {
-		return titulo;
-	}
-	public void setTitulo(String titulo) {
-		this.titulo = titulo;
-	}
+
 	public String getDescricao() {
 		return descricao;
 	}
