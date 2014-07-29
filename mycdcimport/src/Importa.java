@@ -17,7 +17,11 @@ import br.com.wofsolutions.model.Parte;
 import br.com.wofsolutions.model.Seccao;
 import br.com.wofsolutions.model.Titulo;
 import br.com.wofsolutions.util.HibernateUtil;
-
+/**
+ * 
+ * @author Helber Fernandes
+ *
+ */
 public class Importa {
 
 	private static List<Livro> livros = new ArrayList<Livro>();
@@ -58,7 +62,7 @@ public class Importa {
 			Seccao seccao = null;
 			Canone canone = null;
 
-			HibernateUtil.gerabanco();
+		//	HibernateUtil.gerabanco();
 
 			// Livro livro = new Livro();
 			// livro.setTitulo("ssss");
