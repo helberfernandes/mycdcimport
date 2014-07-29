@@ -26,6 +26,7 @@ import org.hibernate.criterion.Restrictions;
 import br.com.wofsolutions.model.Artigo;
 import br.com.wofsolutions.model.Canone;
 import br.com.wofsolutions.model.Capitulo;
+import br.com.wofsolutions.model.Glossario;
 import br.com.wofsolutions.model.Livro;
 import br.com.wofsolutions.model.Parte;
 import br.com.wofsolutions.model.Seccao;
@@ -386,4 +387,23 @@ public class LivroDAOImpl implements Serializable {
 		return canone;
 	}
 
+	
+	
+	
+	
+	public void salvar(Glossario glossario) {
+		ConexaoUtil conexaoUtil = new ConexaoUtil();
+
+		try {
+			PreparedStatement ps = conexaoUtil.getCon().prepareStatement(
+					"INSERT INTO wof_glossario (palavra, significado) VALUES (?,?)");
+			ps.setString(1, glossario.getPalavra());
+			ps.setString(2, glossario.getSignificado());
+			ps.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 }

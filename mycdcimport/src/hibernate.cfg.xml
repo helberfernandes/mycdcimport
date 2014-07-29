@@ -40,6 +40,9 @@
 		<mapping class="br.com.wofsolutions.model.Parte" />
 		<mapping class="br.com.wofsolutions.model.Titulo" />
 		<mapping class="br.com.wofsolutions.model.Capitulo" />
+		
+		
+		<mapping class="br.com.wofsolutions.model.Glossario" />
 
 	</session-factory>
 </hibernate-configuration>
