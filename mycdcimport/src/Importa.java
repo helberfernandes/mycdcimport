@@ -62,7 +62,44 @@ public class Importa {
 			Seccao seccao = null;
 			Canone canone = null;
 
-		//	HibernateUtil.gerabanco();
+			/**
+			 * Impede que o canone continue quando encontra algum titulo
+			 * ele deve enscerrar caso tenha iniciado um titulo
+			 */
+			boolean encontrouTitulo =false;
+			
+			
+			/**
+			 * Impede que o canone continue quando encontra algum caitulo
+			 * ele deve enscerrar caso tenha iniciado um titulo
+			 */
+			boolean encontrouCaptulo =false;
+			
+			
+			
+			/**
+			 * Impede que o canone continue quando encontra algum parte
+			 * ele deve enscerrar caso tenha iniciado um titulo
+			 */
+			boolean encontrouParte =false;
+			
+			
+			/**
+			 * Impede que o canone continue quando encontra algum seccao
+			 * ele deve enscerrar caso tenha iniciado um titulo
+			 */
+			boolean encontrouSeccao =false;
+			
+			
+			
+			
+			/**
+			 * Impede que o canone continue quando encontra algum artigo
+			 * ele deve enscerrar caso tenha iniciado um titulo
+			 */
+			boolean encontrouArtigo =false;
+			
+			HibernateUtil.gerabanco();
 
 			// Livro livro = new Livro();
 			// livro.setTitulo("ssss");
@@ -74,6 +111,10 @@ public class Importa {
 				s = br.readLine();
 				if (s != null) {
 
+					if(canone!=null){
+					livroDAOImpl.salvar(canone);
+					}
+					
 					pegaJava = Pattern
 							.compile("LIVRO [A-Z]{1,3} - [A-Z \\p{L}]*");
 					m = pegaJava.matcher(s);
@@ -107,6 +148,7 @@ public class Importa {
 						livro.getPartes().add(parte);
 
 						livroDAOImpl.salvar(parte);
+						encontrouParte=true;
 					}
 
 					pegaJava = Pattern
@@ -120,8 +162,13 @@ public class Importa {
 						parte.getSeccaos().add(seccao);
 
 						livroDAOImpl.salvar(seccao);
+						
+						encontrouSeccao=true;
 					}
 
+					
+					
+					
 					pegaJava = Pattern
 							.compile("TÍTULO [A-Z]{1,4} - [A-Z \\p{L}]*");
 					m = pegaJava.matcher(s);
@@ -132,7 +179,8 @@ public class Importa {
 						titulo.setLivro(livroDAOImpl.getLivro(livro));
 
 						livro.getTitulos().add(titulo);
-
+						
+						
 						if (seccao != null) {
 							titulo.setSeccao(livroDAOImpl.getSeccao(seccao));
 						}
@@ -142,6 +190,11 @@ public class Importa {
 						}
 
 						livroDAOImpl.salvar(titulo);
+						
+						
+						capitulo= null;
+						artigo = null;
+						encontrouTitulo=true;
 
 					}
 
@@ -150,6 +203,7 @@ public class Importa {
 					m = pegaJava.matcher(s);
 
 					while (m.find()) {
+						encontrouCaptulo=true;
 						capitulo = new Capitulo();
 						capitulo.setDescricao(m.group());
 						if (titulo != null) {
@@ -182,18 +236,25 @@ public class Importa {
 									.getCapitulo(capitulo));
 						}
 						livroDAOImpl.salvar(artigo);
+						
+						encontrouArtigo=true;
 					}
 
 					if (s.contains("Cân.")) {
 
+						encontrouTitulo=false;
+						encontrouCaptulo=false;
+						encontrouParte=false;
+						encontrouSeccao=false;
+						encontrouArtigo=false;
 						String numcan = s.substring(s.indexOf("Cân."),
 								s.indexOf("—") + 1);
 						numcan = numcan.replace("Cân.", "");
 						numcan = numcan.replace("—", "");
 
-						if (canone != null) {
-							livroDAOImpl.salvar(canone);
-						}
+//						if (canone != null) {
+//							livroDAOImpl.salvar(canone);
+//						}
 						canone = new Canone();
 						canone.setNumero(numcan.trim());
 						// s= s.replace(s.substring(s.indexOf("Cï¿½n."),
@@ -248,14 +309,35 @@ public class Importa {
 
 						}
 
+						
+						
 					} else if (!s.trim().isEmpty()) {
 						if (canone != null) {
-
+							if(!encontrouTitulo){
+								if(!encontrouCaptulo){
+									if(!encontrouParte){
+										if(!encontrouSeccao){
+											if(!encontrouArtigo){
 							canone.setDescricao(canone.getDescricao() + s);
-
+											}
+										}
+									}
+								}
+							}
+							
+							
 						}
+						
 					}
 
+					
+					
+					
+					
+//					if(canone!=null){
+//						
+//						livroDAOImpl.salvar(canone);
+//					}
 				}
 
 			}
@@ -267,17 +349,17 @@ public class Importa {
 			}
 			livros.add(livro);// o ultimo livro so e pego quando termina o while
 
-			for (Livro livro2 : livros) {
-				System.out.println(livro2.getDescricao());
-
-				if (livro2.getPartes().size() > 0) {// parte vem antes de todos
-													// os outros itens
-					imprimeParte(livro2.getPartes());
-				} else {// caso o livro já comece com um titulo.
-					imprimeTitulo(livro2.getTitulos());
-				}
-
-			}
+//			for (Livro livro2 : livros) {
+//				System.out.println(livro2.getDescricao());
+//
+//				if (livro2.getPartes().size() > 0) {// parte vem antes de todos
+//													// os outros itens
+//					imprimeParte(livro2.getPartes());
+//				} else {// caso o livro já comece com um titulo.
+//					imprimeTitulo(livro2.getTitulos());
+//				}
+//
+//			}
 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

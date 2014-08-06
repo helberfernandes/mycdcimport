@@ -38,12 +38,13 @@ import br.com.wofsolutions.util.ConexaoUtil;
  * 
  */
 public class LivroDAOImpl implements Serializable {
-
+	PreparedStatement ps;
+	ConexaoUtil conexaoUtil = new ConexaoUtil();
 	public void salvar(Livro livro) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
-			PreparedStatement ps = conexaoUtil.getCon().prepareStatement(
+			 ps = conexaoUtil.getCon().prepareStatement(
 					"INSERT INTO wof_livros (descricao) VALUES (?)");
 			ps.setString(1, livro.getDescricao());
 			ps.execute();
@@ -55,11 +56,11 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public void salvar(Titulo titulo) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
 
-			PreparedStatement ps = conexaoUtil
+			 ps = conexaoUtil
 					.getCon()
 					.prepareStatement(
 							"INSERT INTO wof_titulos (descricao, livro_id, parte_id, seccao_id) VALUES (?, ?, ?,?)");
@@ -87,8 +88,8 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public void salvar(Capitulo capitulo) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
-		PreparedStatement ps;
+		
+		
 		try {
 
 			ps = conexaoUtil
@@ -119,15 +120,19 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public void salvar(Artigo artigo) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
-			PreparedStatement ps = conexaoUtil
+			ps = conexaoUtil
 					.getCon()
 					.prepareStatement(
 							"INSERT INTO wof_artigos (descricao, capitulo_id) VALUES (?, ?)");
 			ps.setString(1, artigo.getDescricao());
+if(artigo.getCapitulo()!=null){
 			ps.setInt(2, artigo.getCapitulo().getCapituloId());
+}else{
+	ps.setNull(2, 0);		
+			}
 			ps.execute();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -137,10 +142,10 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public void salvar(Parte parte) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
-			PreparedStatement ps = conexaoUtil
+			 ps = conexaoUtil
 					.getCon()
 					.prepareStatement(
 							"INSERT INTO wof_partes (descricao, livro_id) VALUES (?, ?)");
@@ -155,10 +160,10 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public void salvar(Seccao seccao) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
-			PreparedStatement ps = conexaoUtil
+			 ps = conexaoUtil
 					.getCon()
 					.prepareStatement(
 							"INSERT INTO wof_seccao (descricao, parte_id) VALUES (?, ?)");
@@ -173,12 +178,12 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public void salvar(Canone canone) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
-		PreparedStatement ps = null;
+		
+		 ps = null;
 
 		try {
-
-			if (getCanonePeloNumero(canone).getCanoneId() == null) {
+			Integer canoneId=getCanonePeloNumero(canone).getCanoneId();
+			if (canoneId == null) {
 
 				ps = conexaoUtil
 						.getCon()
@@ -218,6 +223,47 @@ public class LivroDAOImpl implements Serializable {
 				}
 
 				ps.execute();
+			}else{
+				ps = conexaoUtil
+						.getCon()
+						.prepareStatement(
+								"update wof_canones set descricao=?, numero=?,  livro_id=?, titulo_id=?, parte_id=?, capitulo_id=?, artigo_id=? "
+										+ "where canone_id=?");
+				ps.setString(1, canone.getDescricao());
+				ps.setString(2, canone.getNumero());
+
+				if (canone.getLivro() != null) {
+					ps.setInt(3, canone.getLivro().getLivroId());
+				} else {
+					ps.setNull(3, 0);
+				}
+
+				if (canone.getTitulo() != null) {
+					ps.setInt(4, canone.getTitulo().getTituloId());
+				} else {
+					ps.setNull(4, 0);
+				}
+				if (canone.getParte() != null) {
+					ps.setInt(5, canone.getParte().getParteId());
+				} else {
+					ps.setNull(5, 0);
+				}
+
+				if (canone.getCapitulo() != null) {
+					ps.setInt(6, canone.getCapitulo().getCapituloId());
+				} else {
+					ps.setNull(6, 0);
+				}
+
+				if (canone.getArtigo() != null) {					
+					ps.setInt(7, canone.getArtigo().getArtigoId());
+				} else {
+					ps.setNull(7, 0);
+				}
+
+				ps.setInt(8, canoneId);
+					
+				ps.execute();
 			}
 
 		} catch (SQLException e) {
@@ -228,8 +274,8 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public void update(Canone canone) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
-		PreparedStatement ps = null;
+		
+		
 
 		try {
 
@@ -261,10 +307,10 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public Livro getLivro(Livro livro) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
-			PreparedStatement ps = conexaoUtil.getCon().prepareStatement(
+			 ps = conexaoUtil.getCon().prepareStatement(
 					"select livro_id from wof_livros where descricao=?");
 			ps.setString(1, livro.getDescricao());
 			ResultSet rs = ps.executeQuery();
@@ -279,10 +325,10 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public Titulo getTitulo(Titulo titulo) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
-			PreparedStatement ps = conexaoUtil.getCon().prepareStatement(
+			ps = conexaoUtil.getCon().prepareStatement(
 					"select titulo_id from wof_titulos where descricao=?");
 			ps.setString(1, titulo.getDescricao());
 			ResultSet rs = ps.executeQuery();
@@ -297,10 +343,10 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public Capitulo getCapitulo(Capitulo capitulo) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
-			PreparedStatement ps = conexaoUtil.getCon().prepareStatement(
+			 ps = conexaoUtil.getCon().prepareStatement(
 					"select capitulo_id from wof_capitulos where descricao=?");
 			ps.setString(1, capitulo.getDescricao());
 			ResultSet rs = ps.executeQuery();
@@ -316,10 +362,10 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public Parte getParte(Parte parte) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
-			PreparedStatement ps = conexaoUtil.getCon().prepareStatement(
+			 ps = conexaoUtil.getCon().prepareStatement(
 					"select parte_id from wof_partes where descricao=?");
 			ps.setString(1, parte.getDescricao());
 			ResultSet rs = ps.executeQuery();
@@ -334,10 +380,10 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public Seccao getSeccao(Seccao seccao) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
-			PreparedStatement ps = conexaoUtil.getCon().prepareStatement(
+			 ps = conexaoUtil.getCon().prepareStatement(
 					"select seccao_id from wof_seccao where descricao=?");
 			ps.setString(1, seccao.getDescricao());
 			ResultSet rs = ps.executeQuery();
@@ -352,10 +398,10 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public Artigo getArtigo(Artigo artigo) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
-			PreparedStatement ps = conexaoUtil.getCon().prepareStatement(
+			 ps = conexaoUtil.getCon().prepareStatement(
 					"select artigo_id from wof_artigos where descricao=?");
 			ps.setString(1, artigo.getDescricao());
 			ResultSet rs = ps.executeQuery();
@@ -370,10 +416,10 @@ public class LivroDAOImpl implements Serializable {
 	}
 
 	public Canone getCanonePeloNumero(Canone canone) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
-			PreparedStatement ps = conexaoUtil.getCon().prepareStatement(
+			 ps = conexaoUtil.getCon().prepareStatement(
 					"select canone_id from wof_canones where numero=?");
 			ps.setString(1, canone.getNumero());
 			ResultSet rs = ps.executeQuery();
@@ -392,10 +438,10 @@ public class LivroDAOImpl implements Serializable {
 	
 	
 	public void salvar(Glossario glossario) {
-		ConexaoUtil conexaoUtil = new ConexaoUtil();
+		
 
 		try {
-			PreparedStatement ps = conexaoUtil.getCon().prepareStatement(
+			 ps = conexaoUtil.getCon().prepareStatement(
 					"INSERT INTO wof_glossario (palavra, significado) VALUES (?,?)");
 			ps.setString(1, glossario.getPalavra());
 			ps.setString(2, glossario.getSignificado());
